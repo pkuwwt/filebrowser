@@ -39,12 +39,12 @@ func NewHandler(
 	r = r.SkipClean(true)
 
 	monkey := func(fn handleFunc, prefix string) http.Handler {
-		return handle(fn, prefix, store, server)
+		return handle(RequestLogHandleFunc(fn, server), prefix, store, server)
 	}
 
-	r.HandleFunc("/health", healthHandler)
-	r.PathPrefix("/static").Handler(static)
-	r.NotFoundHandler = index
+	r.HandleFunc("/health", RequestLogHandlerFunc(healthHandler, server))
+	r.PathPrefix("/static").Handler(RequestLogHandler(static, server))
+	r.NotFoundHandler = RequestLogHandler(index, server)
 
 	api := r.PathPrefix("/api").Subrouter()
 
